@@ -9,7 +9,7 @@ using ESolutions.Alexandria.Persistence;
 
 namespace ESolutions.Alexandria.UnitTests
 {
-	public class UnitTestStoreClient : IDocumentHandler
+	public class UnitTestStoreClient : IStoreClient
 	{
 		//Fields
 		#region documentStore

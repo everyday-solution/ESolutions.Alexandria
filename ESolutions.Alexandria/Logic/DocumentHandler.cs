@@ -12,7 +12,7 @@ namespace ESolutions.Alexandria.Logic
 	{
 		//Fields
 		#region documentHandler
-		readonly IDocumentHandler documentHandler = null;
+		readonly IStoreClient storeClient = null;
 		#endregion
 
 		#region fileReader
@@ -21,9 +21,9 @@ namespace ESolutions.Alexandria.Logic
 
 		//Constructors
 		#region DocumentHandler
-		public DocumentHandler(IDocumentHandler documentHandler, IFileReader fileReader)
+		public DocumentHandler(IStoreClient storeClient, IFileReader fileReader)
 		{
-			this.documentHandler = documentHandler;
+			this.storeClient = storeClient;
 			this.fileReader = fileReader;
 		}
 		#endregion
@@ -36,7 +36,7 @@ namespace ESolutions.Alexandria.Logic
 			data.Read(bytes, 0, (Int32)data.Length);
 			var hash = System.Security.Cryptography.SHA512.Create().ComputeHash(bytes);
 			data.Position = 0;
-			var newDocument = this.documentHandler.CreateDocument();
+			var newDocument = this.storeClient.CreateDocument();
 
 			newDocument.Guid = Guid.NewGuid();
 			newDocument.ArchiveTimestampUtc = DateTime.UtcNow;
@@ -47,7 +47,7 @@ namespace ESolutions.Alexandria.Logic
 			newDocument.Data = data;
 			newDocument.Fulltext = this.fileReader?.ReadFulltext(data);
 
-			await this.documentHandler.SaveDocumentAsync(newDocument);
+			await this.storeClient.SaveDocumentAsync(newDocument);
 
 			return newDocument;
 		}
@@ -56,14 +56,14 @@ namespace ESolutions.Alexandria.Logic
 		#region SearchAsync
 		public async Task<IEnumerable<IDocument>> SearchAsync(params String[] tags)
 		{
-			return await this.documentHandler.SearchAsync(tags);
+			return await this.storeClient.SearchAsync(tags);
 		}
 		#endregion
 
 		#region LoadSingleAsync
 		public async Task<IDocument> LoadAttachmentAsync(IDocument document)
 		{
-			var data = await this.documentHandler.LoadAttachmentAsync(document);
+			var data = await this.storeClient.LoadAttachmentAsync(document);
 			document.Data = data;
 			return document;
 		}

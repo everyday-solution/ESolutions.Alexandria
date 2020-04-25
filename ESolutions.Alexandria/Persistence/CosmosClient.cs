@@ -45,7 +45,10 @@ namespace ESolutions.Alexandria.Persistence
 		#region Dispose
 		public void Dispose()
 		{
-			this.cosmosClient.Dispose();
+			if (cosmosClient != null)
+			{
+				this.cosmosClient.Dispose();
+			}
 		}
 		#endregion
 

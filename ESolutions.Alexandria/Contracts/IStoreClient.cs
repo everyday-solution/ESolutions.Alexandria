@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ESolutions.Alexandria.Contracts
 {
-	public interface IDocumentHandler
+	public interface IStoreClient
 	{
 		IRawDocument CreateDocument();
 

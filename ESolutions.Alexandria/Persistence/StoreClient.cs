@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ESolutions.Alexandria.Persistence
 {
-	public class StoreClient : IDocumentHandler
+	public class StoreClient : IStoreClient
 	{
 		//Fields
 		#region documentClient
@@ -38,14 +38,14 @@ namespace ESolutions.Alexandria.Persistence
 		#endregion
 
 		#region CreateDocument
-		IRawDocument IDocumentHandler.CreateDocument()
+		IRawDocument IStoreClient.CreateDocument()
 		{
 			return new DocumentMeta();
 		}
 		#endregion
 
 		#region SaveDocumentAsync
-		async Task IDocumentHandler.SaveDocumentAsync(IDocument document)
+		async Task IStoreClient.SaveDocumentAsync(IDocument document)
 		{
 			await this.blobClient.SaveFileAsync(document);
 			await this.documentClient.SaveDocumentAsync(document);
@@ -53,14 +53,14 @@ namespace ESolutions.Alexandria.Persistence
 		#endregion
 
 		#region SearchAsync
-		async Task<IEnumerable<IDocument>> IDocumentHandler.SearchAsync(params String[] searchTerms)
+		async Task<IEnumerable<IDocument>> IStoreClient.SearchAsync(params String[] searchTerms)
 		{
 			return await this.documentClient.SearchAsync(searchTerms);
 		}
 		#endregion
 
 		#region LoadAttachmentAsync
-		async Task<Stream> IDocumentHandler.LoadAttachmentAsync(IDocument document)
+		async Task<Stream> IStoreClient.LoadAttachmentAsync(IDocument document)
 		{
 			return await this.blobClient.GetFileAsync(document);
 		}

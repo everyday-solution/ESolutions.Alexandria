@@ -1,8 +1,10 @@
-﻿using ESolutions.Alexandria.Logic;
+﻿using ESolutions.Alexandria.Contracts;
+using ESolutions.Alexandria.Logic;
 using ESolutions.Alexandria.PdfFileReader;
 using ESolutions.Alexandria.Persistence;
 using ESolutions.Core.Console;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,11 +16,6 @@ namespace ESolutions.Alexandria.Console
 {
 	class Program
 	{
-		//Fields
-		#region cosmosClient
-		private static CosmosClient cosmosClient = null;
-		#endregion
-
 		#region handler
 		private static DocumentHandler handler = null;
 		#endregion
@@ -40,10 +37,15 @@ namespace ESolutions.Alexandria.Console
 					.GetSection("Settings")
 					.Get<Settings>();
 
-				Program.cosmosClient = await CosmosClient.CreateAsync(config.Cosmos.EndpointUri, config.Cosmos.PrimaryKey, config.Cosmos.DatabaseId, config.Cosmos.ContainerId);
-				var blobClient = BlobClient.Create(config.Blob.ConnectionString, config.Blob.ContainerName);
-				var storeClient = new StoreClient(Program.cosmosClient, blobClient);
-				var pdfFileReader = new PdfFileReader.PdfFileReader();
+				using var serviceProvider = new ServiceCollection()
+					.AddSingleton<IDocumentMetaClient, CosmosClient>((provider) => CosmosClient.CreateAsync(config.Cosmos.EndpointUri, config.Cosmos.PrimaryKey, config.Cosmos.DatabaseId, config.Cosmos.ContainerId).Result)
+					.AddSingleton<IDocumentBlobClient, BlobClient>((provider) => BlobClient.Create(config.Blob.ConnectionString, config.Blob.ContainerName))
+					.AddSingleton<IStoreClient, StoreClient>((provider) => new StoreClient(provider.GetService<IDocumentMetaClient>(), provider.GetService<IDocumentBlobClient>()))
+					.AddSingleton<IFileReader, PdfFileReader.PdfFileReader>()
+					.BuildServiceProvider();
+
+				var storeClient = serviceProvider.GetService<IStoreClient>();
+				var pdfFileReader = serviceProvider.GetService<IFileReader>();
 				Program.handler = new DocumentHandler(storeClient, pdfFileReader);
 
 				var menu = new List<MenuItem>()
@@ -57,10 +59,6 @@ namespace ESolutions.Alexandria.Console
 			catch (Exception ex)
 			{
 				System.Console.Write(ex.Message);
-			}
-			finally
-			{
-				Program.cosmosClient.Dispose();
 			}
 		}
 		#endregion
