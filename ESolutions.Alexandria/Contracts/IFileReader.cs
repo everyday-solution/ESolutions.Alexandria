@@ -7,6 +7,8 @@ namespace ESolutions.Alexandria.Contracts
 {
 	public interface IFileReader
 	{
+		String FileExtension { get; }
+
 		String ReadFulltext(Stream data);
 	}
 }

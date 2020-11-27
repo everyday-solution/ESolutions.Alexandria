@@ -17,6 +17,7 @@
 		<ProjectReference Include="..\Logic\ESolutions.Alexandria.Logic.csproj" />
 		<ProjectReference Include="..\PdfFileReader\ESolutions.Alexandria.PdfFileReader.csproj" />
 		<ProjectReference Include="..\Persistence\ESolutions.Alexandria.Persistence.csproj" />
+		<ProjectReference Include="..\TxtFileReader\ESolutions.Alexandria.TxtFileReader.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using ESolutions.Alexandria.Contracts;
 using ESolutions.Alexandria.Logic;
 using ESolutions.Alexandria.PdfFileReader;
+using ESolutions.Alexandria.TxtFileReader;
 using ESolutions.Alexandria.Persistence;
 using ESolutions.Core.Console;
 using Microsoft.Extensions.Configuration;
@@ -42,11 +43,12 @@ namespace ESolutions.Alexandria.Console
 					.AddSingleton<IDocumentBlobClient, BlobClient>((provider) => BlobClient.Create(config.Blob.ConnectionString, config.Blob.ContainerName))
 					.AddSingleton<IStoreClient, StoreClient>((provider) => new StoreClient(provider.GetService<IDocumentMetaClient>(), provider.GetService<IDocumentBlobClient>()))
 					.AddSingleton<IFileReader, PdfFileReader.PdfFileReader>()
+					.AddSingleton<IFileReader, TxtFileReader.TxtFileReader>()
 					.BuildServiceProvider();
 
 				var storeClient = serviceProvider.GetService<IStoreClient>();
-				var pdfFileReader = serviceProvider.GetService<IFileReader>();
-				Program.handler = new DocumentHandler(storeClient, pdfFileReader);
+				var pdfFileReader = serviceProvider.GetServices<IFileReader>();
+				Program.handler = new DocumentHandler(storeClient, pdfFileReader.ToArray());
 
 				var menu = new List<MenuItem>()
 				{

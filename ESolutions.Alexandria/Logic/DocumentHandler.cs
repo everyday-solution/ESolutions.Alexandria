@@ -16,15 +16,15 @@ namespace ESolutions.Alexandria.Logic
 		#endregion
 
 		#region fileReader
-		private readonly IFileReader fileReader = null;
+		private readonly IEnumerable<IFileReader> fileReader = null;
 		#endregion
 
 		//Constructors
 		#region DocumentHandler
-		public DocumentHandler(IStoreClient storeClient, IFileReader fileReader)
+		public DocumentHandler(IStoreClient storeClient, params IFileReader[] fileReader)
 		{
 			this.storeClient = storeClient;
-			this.fileReader = fileReader;
+			this.fileReader = fileReader ?? new IFileReader[0];
 		}
 		#endregion
 
@@ -45,7 +45,9 @@ namespace ESolutions.Alexandria.Logic
 			newDocument.Tags = tags;
 			newDocument.Hash = hash;
 			newDocument.Data = data;
-			newDocument.Fulltext = this.fileReader?.ReadFulltext(data);
+
+			var reader = this.fileReader.FirstOrDefault(runner => runner.FileExtension == Path.GetExtension(originalFilename));
+			newDocument.Fulltext = reader?.ReadFulltext(data) ?? String.Empty;
 
 			await this.storeClient.SaveDocumentAsync(newDocument);
 

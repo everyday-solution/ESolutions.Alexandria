@@ -12,6 +12,17 @@ namespace ESolutions.Alexandria.PdfFileReader
 {
 	public class PdfFileReader : IFileReader
 	{
+		//Properties
+		#region FileExtension
+		public String FileExtension
+		{
+			get
+			{
+				return ".pdf";
+			}
+		}
+		#endregion
+
 		//Methods
 		#region ReadFulltext
 		public String ReadFulltext(Stream data)
